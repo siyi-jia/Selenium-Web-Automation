@@ -1,3 +1,4 @@
+
 # 电商平台 Web UI 自动化测试框架
 
 ## 📖 项目简介
@@ -27,5 +28,10 @@
 1. 安装依赖：`pip install selenium pytest pytest-html`
 2. 运行测试：`python -m pytest tests/ --html=report.html --self-contained-html`
 
+
 ![测试报告截图1](images/report1.png)
 ![测试报告截图2](images/report2.png)
+
+
+
+
