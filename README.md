@@ -29,6 +29,7 @@
 2. 运行测试：`python -m pytest tests/ --html=report.html --self-contained-html`
 
 
-<img width="858" height="264" alt="Snipaste_2026-10-30_18-12-18" src="https://github.com/user-attachments/assets/dfd28d38-79c7-4ef9-807a-9f82cd5869a6" />
-<img width="861" height="944" alt="Snipaste_2026-10-30_18-11-28" src="https://github.com/user-attachments/assets/f53174df-4fa7-42e4-9c7b-e5badfd1a949" />
+<img width="858" height="264" alt="Snipaste_2026-10-30_18-12-18" src="https://github.com/user-attachments/assets/15109f1e-7f3d-4bce-bdd1-e93644859f33" />
+
+<img width="861" height="944" alt="Snipaste_2026-10-30_18-11-28" src="https://github.com/user-attachments/assets/e62125dc-2c66-4bc4-a098-89c1a0eac4f2" />
 
