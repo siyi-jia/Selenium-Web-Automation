@@ -29,9 +29,9 @@
 2. 运行测试：`python -m pytest tests/ --html=report.html --self-contained-html`
 
 
-![测试报告截图1](images/report1.png)
-![测试报告截图2](images/report2.png)
+![测试报告截图1](https://github.com/user-attachments/assets/9c444848-7907-446c-ac2b-96f6b98c00c4)
+![测试报告截图2](https://github.com/user-attachments/assets/9a63c30a-1432-4e33-a2ff-0d5de2ce0b0e)
 
 
-
+·
 
