@@ -23,6 +23,7 @@
 ├── pytest.ini      # pytest 配置文件
 ├── report.html     # 测试报告
 └── README.md
+```
 
 ## 🚀 快速开始
 1. 安装依赖：`pip install selenium pytest pytest-html`
