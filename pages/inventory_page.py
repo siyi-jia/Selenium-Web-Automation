@@ -27,6 +27,9 @@ class InventoryPage:
         item_id = f"remove-{item_name}"
         self.driver.find_element(By.ID, item_id).click()
 
+    def remove_item_from_inventory(self, item_name):
+        self.driver.find_element(By.ID, f"remove-{item_name}").click()
+
     def get_cart_count(self):
         try:
             return self.driver.find_element(*self.cart_badge).text

@@ -12,3 +12,6 @@ class CartPage:
 
     def click_continue_shopping(self):
         self.driver.find_element(*self.continue_shopping_btn).click()
+
+    def remove_item(self, item_name):
+        self.driver.find_element(By.ID, f"remove-{item_name}").click()

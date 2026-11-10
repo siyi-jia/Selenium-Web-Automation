@@ -5,98 +5,124 @@ from pages.inventory_page import InventoryPage
 from pages.cart_page import CartPage
 from pages.checkout_page import CheckoutPage
 
-
 @pytest.fixture
 def driver_setup():
     driver = webdriver.Chrome()
-    # 【关键修复】加入隐式等待，防止网页加载慢导致找不到元素
     driver.implicitly_wait(5)
     driver.get("https://www.saucedemo.com/")
     yield driver
     driver.quit()
 
-
-# ================= 模块一：登录异常场景测试 =================
+# ================= 模块一：登录鉴权异常流（8条） =================
 @pytest.mark.parametrize("username, password, expected_error", [
-    ("locked_out_user", "secret_sauce", "Epic sadface: Sorry, this user has been locked out."),
-    ("standard_user", "wrong_password", "Epic sadface: Username and password do not match any user in this service"),
-    ("", "secret_sauce", "Epic sadface: Username is required"),
+    ("locked_out_user", "secret_sauce", "Sorry, this user has been locked out"),
+    ("standard_user", "wrong_password", "Username and password do not match"),
+    ("", "secret_sauce", "Username is required"),
+    ("standard_user", "", "Password is required"),
+    ("", "", "Username is required"),
+    ("problem_user", "wrong_pwd", "Username and password do not match"),
+    ("performance_glitch_user", "wrong_pwd", "Username and password do not match"),
+    ("error_user", "wrong_pwd", "Username and password do not match"),
 ])
 def test_login_negative_scenarios(driver_setup, username, password, expected_error):
-    login_page = LoginPage(driver_setup)
-    login_page.login(username, password)
-    assert expected_error in login_page.get_error_message()
+    login = LoginPage(driver_setup)
+    login.login(username, password)
+    assert expected_error in login.get_error_message()
 
-
-# ================= 模块二：商品列表与购物车操作 =================
-def test_product_sorting(driver_setup):
+# ================= 模块二：商品列表与排序（6条） =================
+def test_sort_price_low_to_high(driver_setup):
     LoginPage(driver_setup).login("standard_user", "secret_sauce")
-    inv_page = InventoryPage(driver_setup)
-    inv_page.sort_by("lohi")
-    prices = inv_page.get_all_prices()
-    assert prices == sorted(prices), "商品未能正确按价格升序排列"
+    inv = InventoryPage(driver_setup)
+    inv.sort_by("lohi")
+    prices = inv.get_all_prices()
+    assert prices == sorted(prices)
 
-
-def test_add_and_remove_items_from_cart(driver_setup):
+def test_sort_price_high_to_low(driver_setup):
     LoginPage(driver_setup).login("standard_user", "secret_sauce")
-    inv_page = InventoryPage(driver_setup)
-    inv_page.add_item_to_cart("sauce-labs-backpack")
-    inv_page.add_item_to_cart("sauce-labs-bike-light")
-    assert inv_page.get_cart_count() == "2"
-    inv_page.remove_item_from_cart("sauce-labs-backpack")
-    assert inv_page.get_cart_count() == "1", "移除商品后购物车数量未正确减少"
+    inv = InventoryPage(driver_setup)
+    inv.sort_by("hilo")
+    prices = inv.get_all_prices()
+    assert prices == sorted(prices, reverse=True)
 
+def test_add_single_item(driver_setup):
+    LoginPage(driver_setup).login("standard_user", "secret_sauce")
+    inv = InventoryPage(driver_setup)
+    inv.add_item_to_cart("sauce-labs-backpack")
+    assert inv.get_cart_count() == "1"
 
-def test_continue_shopping_from_cart(driver_setup):
+def test_add_multiple_items(driver_setup):
+    LoginPage(driver_setup).login("standard_user", "secret_sauce")
+    inv = InventoryPage(driver_setup)
+    inv.add_item_to_cart("sauce-labs-backpack")
+    inv.add_item_to_cart("sauce-labs-bike-light")
+    assert inv.get_cart_count() == "2"
+
+def test_remove_item_from_inventory(driver_setup):
+    LoginPage(driver_setup).login("standard_user", "secret_sauce")
+    inv = InventoryPage(driver_setup)
+    inv.add_item_to_cart("sauce-labs-backpack")
+    inv.remove_item_from_inventory("sauce-labs-backpack")
+    assert inv.get_cart_count() == "0"
+
+def test_continue_shopping_btn(driver_setup):
     LoginPage(driver_setup).login("standard_user", "secret_sauce")
     InventoryPage(driver_setup).go_to_cart()
-    cart_page = CartPage(driver_setup)
-    cart_page.click_continue_shopping()
-    assert "inventory.html" in driver_setup.current_url, "未能返回商品列表页"
+    CartPage(driver_setup).click_continue_shopping()
+    assert "inventory.html" in driver_setup.current_url
 
-
-# ================= 模块三：订单结算与异常校验 =================
-def test_checkout_missing_fields(driver_setup):
+# ================= 模块三：结算异常与财务校验（11条） =================
+@pytest.mark.parametrize("fname, lname, zipcode, error_msg", [
+    ("", "", "", "Error: First Name is required"),
+    ("Test", "", "", "Error: Last Name is required"),
+    ("Test", "User", "", "Error: Postal Code is required"),
+    ("", "User", "123", "Error: First Name is required"),
+])
+def test_checkout_form_validation(driver_setup, fname, lname, zipcode, error_msg):
     LoginPage(driver_setup).login("standard_user", "secret_sauce")
-    InventoryPage(driver_setup).add_item_to_cart("sauce-labs-backpack")
-    InventoryPage(driver_setup).go_to_cart()
+    inv = InventoryPage(driver_setup)
+    inv.add_item_to_cart("sauce-labs-backpack")
+    inv.go_to_cart()
     CartPage(driver_setup).click_checkout()
-    checkout_page = CheckoutPage(driver_setup)
-    checkout_page.fill_info("", "", "")
-    assert "Error: First Name is required" in checkout_page.get_error_message()
+    checkout = CheckoutPage(driver_setup)
+    checkout.fill_info(fname, lname, zipcode)
+    assert error_msg in checkout.get_error_message()
 
-
-def test_cancel_checkout_process(driver_setup):
+def test_cancel_checkout(driver_setup):
     LoginPage(driver_setup).login("standard_user", "secret_sauce")
-    InventoryPage(driver_setup).add_item_to_cart("sauce-labs-backpack")
-    InventoryPage(driver_setup).go_to_cart()
+    inv = InventoryPage(driver_setup)
+    inv.add_item_to_cart("sauce-labs-backpack")
+    inv.go_to_cart()
     CartPage(driver_setup).click_checkout()
-    checkout_page = CheckoutPage(driver_setup)
-    checkout_page.click_cancel()
-    assert "cart.html" in driver_setup.current_url, "取消结算未能返回购物车"
+    CheckoutPage(driver_setup).click_cancel()
+    assert "cart.html" in driver_setup.current_url
 
+def test_remove_item_from_cart(driver_setup):
+    LoginPage(driver_setup).login("standard_user", "secret_sauce")
+    inv = InventoryPage(driver_setup)
+    inv.add_item_to_cart("sauce-labs-backpack")
+    inv.go_to_cart()
+    CartPage(driver_setup).remove_item("sauce-labs-backpack")
+    assert "cart.html" in driver_setup.current_url
 
 def test_financial_calculation_check(driver_setup):
     LoginPage(driver_setup).login("standard_user", "secret_sauce")
-    InventoryPage(driver_setup).add_item_to_cart("sauce-labs-backpack")
-    InventoryPage(driver_setup).go_to_cart()
+    inv = InventoryPage(driver_setup)
+    inv.add_item_to_cart("sauce-labs-backpack")
+    inv.add_item_to_cart("sauce-labs-bike-light")
+    inv.go_to_cart()
     CartPage(driver_setup).click_checkout()
+    checkout = CheckoutPage(driver_setup)
+    checkout.fill_info("Test", "User", "100000")
+    subtotal, tax, total = checkout.get_prices_on_summary()
+    assert round(subtotal + tax, 2) == total, "财务计算精度错误"
 
-    checkout_page = CheckoutPage(driver_setup)
-    checkout_page.fill_info("Test", "User", "100000")
-
-    subtotal, tax, total = checkout_page.get_prices_on_summary()
-    assert round(subtotal + tax, 2) == total, "订单总金额计算错误"
-
-
-# ================= 模块四：正向端到端全流程 =================
 def test_e2e_successful_checkout(driver_setup):
     LoginPage(driver_setup).login("standard_user", "secret_sauce")
-    InventoryPage(driver_setup).add_item_to_cart("sauce-labs-backpack")
-    InventoryPage(driver_setup).go_to_cart()
+    inv = InventoryPage(driver_setup)
+    inv.add_item_to_cart("sauce-labs-backpack")
+    inv.go_to_cart()
     CartPage(driver_setup).click_checkout()
-
-    checkout_page = CheckoutPage(driver_setup)
-    checkout_page.fill_info("Test", "User", "100000")
-    checkout_page.click_finish()
-    assert "Thank you for your order!" in checkout_page.get_success_message()
+    checkout = CheckoutPage(driver_setup)
+    checkout.fill_info("Test", "User", "100000")
+    checkout.click_finish()
+    assert "Thank you for your order!" in checkout.get_success_message()

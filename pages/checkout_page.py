@@ -34,7 +34,6 @@ class CheckoutPage:
         return self.driver.find_element(*self.success_header).text
 
     def get_prices_on_summary(self):
-        # 获取结账页面的小计、税费和总计
         subtotal = float(self.driver.find_element(*self.subtotal_label).text.split("$")[1])
         tax = float(self.driver.find_element(*self.tax_label).text.split("$")[1])
         total = float(self.driver.find_element(*self.total_label).text.split("$")[1])
