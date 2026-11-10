@@ -23,6 +23,14 @@
 └── README.md
 ```
 
+## 🚀 快速开始
+
+1. 安装项目依赖：
+   `pip install selenium pytest allure-pytest`
+2. 执行全量自动化测试并生成底层数据：
+   `python -m pytest tests/ --alluredir=./reports/allure-results --clean-alluredir`
+3. 启动本地服务查看可视化测试报告：
+   `allure serve ./reports/allure-results`
 
 ## 📊 测试成果展示
 
@@ -32,8 +40,8 @@
 ### 2. 核心业务用例详情
 ![测试报告截图2](images/2.png)
 
-### 3. 财务级断言执行日志
-![测试报告截图3](images/3.png)
+### 3. 端到端用例测试步骤展开
+![核心业务链路执行详情](images/3.png)
 
 
 
