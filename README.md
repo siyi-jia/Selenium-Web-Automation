@@ -21,18 +21,20 @@
 ├── tests/          # 测试用例层（业务断言与参数化）
 ├── pytest.ini      # Pytest 配置文件（解决模块导入问题）
 └── README.md
+```
 
 
 ## 📊 测试成果展示
 
 ### 1. Allure 测试报告总览
-![测试报告截图1](images/report1.png)
+![测试报告截图1](images/1.png)
 
 ### 2. 核心业务用例详情
-![测试报告截图2](images/report2.png)
+![测试报告截图2](images/2.png)
 
 ### 3. 财务级断言执行日志
-![测试报告截图3](images/report3.png)
+![测试报告截图3](images/3.png)
+
 
 
 
